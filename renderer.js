@@ -47,6 +47,7 @@ function applyFilters() {
   updateStatusChart(rows);
   renderTable(rows);
   updateSummary(rows);
+  updateKPIs(rows);
 }
 
 function updateSummary(rows) {
@@ -54,6 +55,26 @@ function updateSummary(rows) {
   if (el) {
     el.textContent = rows.length ? `${rows.length} records` : 'No data loaded';
   }
+}
+
+function updateKPIs(rows) {
+  const totalEl = document.getElementById('recordCountKpi');
+  if (totalEl) totalEl.textContent = `Records: ${rows.length}`;
+
+  const deadlineEl = document.getElementById('deadlineKpi');
+  if (!deadlineEl) return;
+  const key = Object.keys(rows[0] || {}).find(k => k.toLowerCase().includes('deadline'));
+  if (!key) {
+    deadlineEl.textContent = '';
+    return;
+  }
+  const now = new Date();
+  const soon = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const count = rows.filter(r => {
+    const d = new Date(r[key]);
+    return !isNaN(d) && d >= now && d <= soon;
+  }).length;
+  deadlineEl.textContent = `Deadlines ≤7d: ${count}`;
 }
 
 function updateImportDisplay() {
@@ -156,6 +177,7 @@ function parseFile(file) {
       renderTableHeader(currentRows[0]);
       updateFilterOptions(currentRows);
       applyFilters();
+      updateKPIs(currentRows);
       saveData(currentRows);
       saveImportTime(new Date().toISOString());
       showToast('Import completed');
@@ -365,4 +387,5 @@ document.getElementById('userDisplay').textContent = `User: ${os.userInfo().user
 loadData();
 loadLog();
 updateSummary(currentRows);
+updateKPIs(currentRows);
 updateImportDisplay();

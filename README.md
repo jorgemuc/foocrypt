@@ -11,6 +11,7 @@ This project is a minimal Electron prototype for a portable Windows dashboard ap
 - Edit rows via an inline prompt and track changes in `changelog.json`
 - Delete rows with a confirmation prompt (also logged)
 - Display a record count summary that updates as you search or edit
+- Show KPI widgets for total records and upcoming deadlines (requires a `Deadline` column)
 - View the change log in a separate table
 - See the timestamp of the last CSV import
 - Switch between dashboard and change log via navigation buttons

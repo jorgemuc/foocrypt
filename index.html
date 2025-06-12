@@ -18,6 +18,16 @@
             margin-bottom: 10px;
             color: #666;
         }
+        #kpiContainer {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .kpi {
+            background: #f2f2f2;
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -41,6 +51,7 @@
     </div>
     <div id="toast" style="display:none; position:fixed; bottom:20px; right:20px; background:#333; color:#fff; padding:8px 12px; border-radius:4px;"></div>
     <div id="summary"></div>
+    <div id="kpiContainer"><div id="recordCountKpi" class="kpi"></div><div id="deadlineKpi" class="kpi"></div></div>
     <div id="lastImport"></div>
     <canvas id="chart" width="400" height="200"></canvas>
     <canvas id="statusChart" width="300" height="200"></canvas>

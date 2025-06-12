@@ -14,7 +14,7 @@
 - [x] Show status pie chart and allow document uploads
 - [x] Display record count summary
 - [ ] Polish UI styling and responsive layout
-- [ ] Add KPI widgets and deadlines
+- [x] Add KPI widgets and deadlines
 - [ ] Improve error handling and validations
 - [ ] Finalize documentation and examples
 - [ ] Resolve DBus/X server issues
@@ -35,7 +35,12 @@
 - `npm start` – fails: X/DBus not available in container
 - `npm run dist` – fails: wine is missing
 
+## Latest Test Results (2025-06-12 session 3)
+- `npm test` – passed
+- `npm start` – fails: X/DBus not available in container
+- `npm run dist` – fails: wine is missing
+
 ## Metrics
 Estimated total effort: 7 person-days
-Completion: ~90%
-Last update: 2025-06-12 (session 2)
+Completion: ~95%
+Last update: 2025-06-12 (session 3)
