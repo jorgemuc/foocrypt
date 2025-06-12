@@ -110,6 +110,7 @@ function validateColumns(row) {
   return true;
 }
 
+
 function updateFilterOptions(rows) {
   const select = document.getElementById('filter');
   if (!select) return;
@@ -623,4 +624,3 @@ updateImportDisplay();
 ensureDocsDir();
 loadDocuments();
 loadTickets();
-

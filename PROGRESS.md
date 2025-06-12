@@ -95,6 +95,7 @@ Estimated total effort: 8 person-days
 Completion: 95%
 Last update: 2025-06-12 (session 22)
 
+
 ## Scope / Level of Done
 - Portable Windows application with no installation
 - CSV import and export
@@ -123,3 +124,4 @@ Last update: 2025-06-12 (session 22)
 - Adjusted table styles so headers remain visible
 - Updated README with sticky header note and install instructions
 - Tests pass after installing dependencies
+
