@@ -4,6 +4,7 @@ const Papa = require('papaparse');
 const { Chart } = require('chart.js');
 const XLSX = require('xlsx');
 const { shell } = require('electron');
+
 const os = require('os');
 
 let currentRows = [];
@@ -90,6 +91,7 @@ function addTicket() {
   logChange(-1, 'ticket', '', JSON.stringify(ticket));
 }
 
+
 function updateFilterOptions(rows) {
   const select = document.getElementById('filter');
   if (!select) return;
@@ -124,6 +126,7 @@ function applyFilters() {
   renderTable(rows);
   updateSummary(rows);
   updateKPIs(rows);
+
 }
 
 function updateSummary(rows) {
@@ -152,6 +155,7 @@ function updateKPIs(rows) {
   }).length;
   deadlineEl.textContent = `Deadlines ≤7d: ${count}`;
 }
+
 
 function updateImportDisplay() {
   const el = document.getElementById('lastImport');
@@ -295,6 +299,7 @@ function parseFile(file) {
       }
     });
   }
+
 }
 
 function handleFileSelect(event) {
@@ -392,6 +397,7 @@ function renderCards(rows) {
   });
 }
 
+
 function renderChangeLog() {
   const table = document.getElementById('changelogTable');
   const thead = table.querySelector('thead');
@@ -436,6 +442,7 @@ function editRow(index) {
       showToast('Value cannot be empty');
       continue;
     }
+
     if (val !== row[key]) {
       logChange(index, key, row[key], val);
       row[key] = val;
@@ -500,6 +507,7 @@ function toggleDarkMode() {
   document.body.classList.toggle('dark');
 }
 
+
 document.getElementById('csvFileInput').addEventListener('change', handleFileSelect);
 document.getElementById('search').addEventListener('input', applyFilters);
 document.getElementById('filter').addEventListener('change', applyFilters);
@@ -522,6 +530,7 @@ document.getElementById('navTickets').addEventListener('click', () => {
   document.getElementById('changelogContainer').style.display = 'none';
   document.getElementById('ticketSection').style.display = 'block';
   renderTickets();
+
 });
 document.getElementById('navLog').addEventListener('click', () => {
   renderChangeLog();
@@ -530,6 +539,7 @@ document.getElementById('navLog').addEventListener('click', () => {
   document.getElementById('ticketSection').style.display = 'none';
 });
 document.getElementById('newTicketBtn').addEventListener('click', addTicket);
+
 
 document.getElementById('uploadDocBtn').addEventListener('click', () => {
   document.getElementById('docInput').click();
@@ -556,6 +566,7 @@ document.getElementById('docInput').addEventListener('change', (e) => {
       console.error('Upload failed:', err);
       showToast('Upload failed');
     }
+
     e.target.value = '';
   }
 });
@@ -582,4 +593,5 @@ updateImportDisplay();
 ensureDocsDir();
 loadDocuments();
 loadTickets();
+
 
