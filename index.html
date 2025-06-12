@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Partner Cockpit Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #controls { margin-bottom: 10px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 4px; }
+        nav { margin-bottom: 10px; }
+        nav button { margin-right: 5px; }
+        #changelogContainer { margin-top: 20px; }
+        #dropZone {
+            border: 2px dashed #666;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Partner Cockpit Dashboard</h1>
+    <div id="userDisplay"></div>
+    <nav>
+        <button id="navDashboard">Dashboard</button>
+        <button id="navLog">Change Log</button>
+    </nav>
+    <div id="dropZone">Drop CSV here or choose a file</div>
+    <div id="controls">
+        <input type="file" id="csvFileInput" accept=".csv" />
+        <select id="filter">
+            <option value="">All</option>
+        </select>
+        <input type="text" id="search" placeholder="Search" />
+        <button id="exportBtn">Export CSV</button>
+        <button id="newTicketBtn">New Ticket</button>
+        <button id="uploadDocBtn">Upload Document</button>
+        <input type="file" id="docInput" style="display:none" />
+    </div>
+    <div id="toast" style="display:none; position:fixed; bottom:20px; right:20px; background:#333; color:#fff; padding:8px 12px; border-radius:4px;"></div>
+    <div id="summary"></div>
+    <div id="lastImport"></div>
+    <canvas id="chart" width="400" height="200"></canvas>
+    <canvas id="statusChart" width="300" height="200"></canvas>
+    <table id="dataTable" border="1">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+    <div id="changelogContainer" style="display:none;">
+        <h2>Change Log</h2>
+        <table id="changelogTable" border="1">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script src="./renderer.js"></script>
+</body>
+</html>
