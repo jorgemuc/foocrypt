@@ -7,17 +7,21 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         #controls { margin-bottom: 10px; }
+        #tableWrapper {
+            max-height: 60vh;
+            overflow: auto;
+            margin-top: 10px;
+            width: 100%;
+        }
         table {
             border-collapse: collapse;
             width: 100%;
-            margin-top: 10px;
-            display: block;
-            max-height: 60vh;
-            overflow: auto;
         }
         thead th {
             position: sticky;
             top: 0;
+            z-index: 1;
+
             background: #fff;
         }
         body.dark thead th { background: #444; }
@@ -55,7 +59,6 @@
             padding: 6px 10px;
             border-radius: 4px;
         }
-
     </style>
 </head>
 <body>
@@ -91,10 +94,12 @@
     <canvas id="chart" width="400" height="200"></canvas>
     <canvas id="statusChart" width="300" height="200"></canvas>
     <div id="cardContainer" style="display:none;"></div>
-    <table id="dataTable" border="1">
-        <thead></thead>
-        <tbody></tbody>
-    </table>
+    <div id="tableWrapper">
+        <table id="dataTable" border="1">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
     <div id="docsSection">
         <h3>Uploaded Documents</h3>
         <ul id="docList"></ul>

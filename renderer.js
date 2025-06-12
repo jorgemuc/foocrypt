@@ -90,6 +90,27 @@ function addTicket() {
   logChange(-1, 'ticket', '', JSON.stringify(ticket));
 }
 
+function hasPartnerColumn(row) {
+  if (!row) return false;
+  return Object.keys(row).some(k => k.toLowerCase().includes('partner'));
+}
+
+function validateColumns(row) {
+  const required = ['Partnername', 'Systemname'];
+  for (const col of required) {
+    if (!Object.keys(row).includes(col)) {
+      showToast(`CSV not compatible: column ${col} missing`);
+      return false;
+    }
+  }
+  if (!hasPartnerColumn(row)) {
+    showToast('CSV not compatible: Partner column missing');
+    return false;
+  }
+  return true;
+}
+
+
 function updateFilterOptions(rows) {
   const select = document.getElementById('filter');
   if (!select) return;
@@ -259,6 +280,10 @@ function parseFile(file) {
         showToast('No valid rows found');
         return;
       }
+      if (!validateColumns(currentRows[0])) {
+        currentRows = [];
+        return;
+      }
       renderTableHeader(currentRows[0]);
       updateFilterOptions(currentRows);
       applyFilters();
@@ -277,7 +302,6 @@ function parseFile(file) {
       skipEmptyLines: true,
       dynamicTyping: false,
       delimitersToGuess: [",", ";", "\t", "|"] ,
-
       complete: (results) => {
         if (results.errors && results.errors.length) {
           console.error('Parse errors:', results.errors);
@@ -287,6 +311,10 @@ function parseFile(file) {
         currentRows = results.data.filter(r => Object.keys(r).length);
         if (currentRows.length === 0) {
           showToast('No valid rows found');
+          return;
+        }
+        if (!validateColumns(currentRows[0])) {
+          currentRows = [];
           return;
         }
         renderTableHeader(currentRows[0]);

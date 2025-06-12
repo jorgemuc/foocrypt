@@ -1,6 +1,7 @@
 # Partner Cockpit Dashboard
 
 This project is a minimal Electron prototype for a portable Windows dashboard application. It demonstrates CSV import, local persistence and basic chart rendering.
+-
 
 ## Features
 - Import partner data from CSV or XLSX files (file chooser or drag & drop)
@@ -23,6 +24,8 @@ This project is a minimal Electron prototype for a portable Windows dashboard ap
 - Upload a document via the **Upload Document** button
 - Uploaded files are saved to the `uploads` folder in the app directory
 - View uploaded documents in a list below the table
+- Table headers are sticky so column titles stay visible
+- CSV columns are validated; missing required columns trigger an error
 - Visualize status counts in a pie chart if the CSV contains a `Status` column
 - Toggle dark mode via the **Toggle Dark Mode** button
 
@@ -43,8 +46,9 @@ This project is a minimal Electron prototype for a portable Windows dashboard ap
    because builds are created in GitHub Actions.)
 
 ## Development
-Run tests and start the app during development:
+Install dependencies once and then run tests and the app:
 ```bash
+npm install
 npm test
 npm start
 ```
