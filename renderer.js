@@ -69,8 +69,12 @@ function saveTickets() {
   } catch {}
 }
 
-function renderTickets() {
-  const ul = document.getElementById('ticketList');
+  const key = rows.length
+    ? Object.keys(rows[0]).find(k => k.toLowerCase().includes('partner')) ||
+      Object.keys(rows[0])[0]
+    : null;
+  select.dataset.key = key || '';
+    const key = select ? select.dataset.key : null;
   if (!ul) return;
   ul.innerHTML = '';
   tickets.forEach(t => {
@@ -237,11 +241,20 @@ function loadData() {
         updateChart(currentRows);
         renderTable(currentRows);
         renderTableHeader(currentRows[0]);
+      document.getElementById('dataTable').scrollIntoView();
+      dynamicTyping: false,
+      delimitersToGuess: [",", ";", "\t", "|"] ,
         updateFilterOptions(currentRows);
         applyFilters();
+        document.getElementById('dataTable').scrollIntoView();
       }
-    }
-    loadImportTime();
+  if (rows.length === 0) return;
+  const keys = Object.keys(rows[0]);
+  const labelKey = keys[0];
+  let valueKey = keys.find(k => rows.some(r => !isNaN(parseFloat(r[k]))));
+  if (!valueKey || valueKey === labelKey) valueKey = keys[1] || keys[0];
+  const labels = rows.map(r => r[labelKey]);
+  const values = rows.map(r => parseFloat(r[valueKey]) || 0);
   } catch (err) {
     console.error('Failed to load data:', err);
   }

@@ -67,7 +67,14 @@
 - Added completion note in BACKLOG.md
 - Tests pass
 
-## Latest Test Results (session 16)
+### Session 17 (2025-06-12)
+- Fixed CSV import bug with delimiter detection
+- Table headers stick to top and table scrolls into view after import
+- Filter dropdown now auto-detects partner column
+- Updated styles for better visibility
+- Tests pass
+
+## Latest Test Results (session 17)
 - `npm test` – passed
 - `npm start` – fails: DBus connection error
 - `npm run dist` – skipped (runs in GitHub Actions)
@@ -75,7 +82,7 @@
 ## Metrics
 Estimated total effort: 8 person-days
 Completion: 100%
-Last update: 2025-06-12 (session 16)
+Last update: 2025-06-12 (session 17)
 
 ## Scope / Level of Done
 - Portable Windows application with no installation
