@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Partner Cockpit Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #controls { margin-bottom: 10px; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+            display: block;
+            max-height: 60vh;
+            overflow: auto;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+        }
+        body.dark thead th { background: #444; }
+        th, td { border: 1px solid #ccc; padding: 4px; }
+        nav { margin-bottom: 10px; }
+        nav button { margin-right: 5px; }
+        body.dark { background: #222; color: #eee; }
+        body.dark table th, body.dark table td { border-color: #555; }
+        @media (max-width:600px) {
+            #kpiContainer { flex-direction: column; }
+            nav button { display:block; margin:5px 0; }
+        }
+        #changelogContainer { margin-top: 20px; }
+        #dropZone {
+            border: 2px dashed #666;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #666;
+        }
+        #kpiContainer {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        .kpi {
+            background: #f2f2f2;
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Partner Cockpit Dashboard</h1>
+    <div id="userDisplay"></div>
+    <nav>
+        <button id="navDashboard">Dashboard</button>
+        <button id="navCards">Cards</button>
+        <button id="navTickets">Tickets</button>
+        <button id="navLog">Change Log</button>
+        <button id="exportLogBtn">Export Log</button>
+        <button id="darkModeBtn">Toggle Dark Mode</button>
+    </nav>
+    <div id="dropZone">Drop CSV here or choose a file</div>
+    <div id="controls">
+        <input type="file" id="csvFileInput" accept=".csv,.xlsx" />
+        <select id="filter">
+            <option value="">All</option>
+        </select>
+        <input type="text" id="search" placeholder="Search" />
+        <button id="exportBtn">Export CSV</button>
+        <button id="exportXlsxBtn">Export XLSX</button>
+        <button id="newTicketBtn">New Ticket</button>
+        <button id="uploadDocBtn">Upload Document</button>
+        <button id="calendarBtn">Calendar</button>
+        <button id="contactBtn">Contact</button>
+        <input type="file" id="docInput" style="display:none" />
+    </div>
+    <div id="toast" style="display:none; position:fixed; bottom:20px; right:20px; background:#333; color:#fff; padding:8px 12px; border-radius:4px;"></div>
+    <div id="summary"></div>
+    <div id="kpiContainer"><div id="recordCountKpi" class="kpi"></div><div id="deadlineKpi" class="kpi"></div></div>
+    <div id="lastImport"></div>
+    <canvas id="chart" width="400" height="200"></canvas>
+    <canvas id="statusChart" width="300" height="200"></canvas>
+    <div id="cardContainer" style="display:none;"></div>
+    <table id="dataTable" border="1">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+    <div id="docsSection">
+        <h3>Uploaded Documents</h3>
+        <ul id="docList"></ul>
+    </div>
+    <div id="ticketSection" style="display:none;">
+        <h2>Tickets</h2>
+        <button id="addTicketBtn">Add Ticket</button>
+        <ul id="ticketList"></ul>
+    </div>
+    <div id="changelogContainer" style="display:none;">
+        <h2>Change Log</h2>
+        <table id="changelogTable" border="1">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script src="./renderer.js"></script>
+</body>
+</html>
