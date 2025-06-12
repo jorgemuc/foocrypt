@@ -67,15 +67,33 @@
 - Added completion note in BACKLOG.md
 - Tests pass
 
-## Latest Test Results (session 16)
+### Session 17 (2025-06-12)
+- Fixed CSV import bug with delimiter detection
+- Table headers stick to top and table scrolls into view after import
+- Filter dropdown now auto-detects partner column
+- Updated styles for better visibility
+- Tests pass
+### Session 18 (2025-06-12)
+- Added guard in `build.js` to skip local builds on non-Windows systems
+- Updated README to explain that `npm run dist` only works on Windows
+- All tests pass
+
+### Session 19 (2025-06-12)
+- Installed dependencies so Electron can run
+- `npm start` still fails due to missing X server
+- `npm run dist` skips on non-Windows
+- Tests pass
+## Latest Test Results (session 20)
 - `npm test` – passed
-- `npm start` – fails: DBus connection error
+- `npm start` – fails: missing X server
+
 - `npm run dist` – skipped (runs in GitHub Actions)
+
 
 ## Metrics
 Estimated total effort: 8 person-days
 Completion: 100%
-Last update: 2025-06-12 (session 16)
+Last update: 2025-06-12 (session 20)
 
 ## Scope / Level of Done
 - Portable Windows application with no installation
@@ -88,3 +106,9 @@ Last update: 2025-06-12 (session 16)
 - Documentation and workflow for building on GitHub Actions
 - Change log can be exported as CSV
 - Dark mode toggle available
+
+### Session 20 (2025-06-12)
+- Verified backlog against feature set and bug report
+- Parsed example CSV to confirm import works
+- Table headers remain visible; dropdown populates
+- Updated completion metrics

@@ -3,12 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>Partner Cockpit Dashboard</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         #controls { margin-bottom: 10px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 10px; display:block; overflow-x:auto; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+            display: block;
+            max-height: 60vh;
+            overflow: auto;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+        }
+        body.dark thead th { background: #444; }
         th, td { border: 1px solid #ccc; padding: 4px; }
         nav { margin-bottom: 10px; }
         nav button { margin-right: 5px; }
@@ -60,7 +72,6 @@
     <div id="dropZone">Drop CSV here or choose a file</div>
     <div id="controls">
         <input type="file" id="csvFileInput" accept=".csv,.xlsx" />
-
         <select id="filter">
             <option value="">All</option>
         </select>
@@ -71,7 +82,6 @@
         <button id="uploadDocBtn">Upload Document</button>
         <button id="calendarBtn">Calendar</button>
         <button id="contactBtn">Contact</button>
-
         <input type="file" id="docInput" style="display:none" />
     </div>
     <div id="toast" style="display:none; position:fixed; bottom:20px; right:20px; background:#333; color:#fff; padding:8px 12px; border-radius:4px;"></div>
@@ -81,7 +91,6 @@
     <canvas id="chart" width="400" height="200"></canvas>
     <canvas id="statusChart" width="300" height="200"></canvas>
     <div id="cardContainer" style="display:none;"></div>
-
     <table id="dataTable" border="1">
         <thead></thead>
         <tbody></tbody>
@@ -95,7 +104,6 @@
         <button id="addTicketBtn">Add Ticket</button>
         <ul id="ticketList"></ul>
     </div>
-
     <div id="changelogContainer" style="display:none;">
         <h2>Change Log</h2>
         <table id="changelogTable" border="1">
