@@ -90,6 +90,11 @@ function addTicket() {
   logChange(-1, 'ticket', '', JSON.stringify(ticket));
 }
 
+function hasPartnerColumn(row) {
+  if (!row) return false;
+  return Object.keys(row).some(k => k.toLowerCase().includes('partner'));
+}
+
 function updateFilterOptions(rows) {
   const select = document.getElementById('filter');
   if (!select) return;
@@ -259,6 +264,11 @@ function parseFile(file) {
         showToast('No valid rows found');
         return;
       }
+      if (!hasPartnerColumn(currentRows[0])) {
+        showToast('CSV not compatible: Partner column missing');
+        currentRows = [];
+        return;
+      }
       renderTableHeader(currentRows[0]);
       updateFilterOptions(currentRows);
       applyFilters();
@@ -277,6 +287,11 @@ function parseFile(file) {
       skipEmptyLines: true,
       dynamicTyping: false,
       delimitersToGuess: [",", ";", "\t", "|"] ,
+        if (!hasPartnerColumn(currentRows[0])) {
+          showToast('CSV not compatible: Partner column missing');
+          currentRows = [];
+          return;
+        }
 
       complete: (results) => {
         if (results.errors && results.errors.length) {

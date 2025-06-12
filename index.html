@@ -7,13 +7,14 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         #controls { margin-bottom: 10px; }
+        #tableWrapper {
+            max-height: 60vh;
+            overflow: auto;
+            margin-top: 10px;
+        }
         table {
             border-collapse: collapse;
             width: 100%;
-            margin-top: 10px;
-            display: block;
-            max-height: 60vh;
-            overflow: auto;
         }
         thead th {
             position: sticky;
@@ -65,10 +66,12 @@
         <button id="navDashboard">Dashboard</button>
         <button id="navCards">Cards</button>
         <button id="navTickets">Tickets</button>
-        <button id="navLog">Change Log</button>
-        <button id="exportLogBtn">Export Log</button>
-        <button id="darkModeBtn">Toggle Dark Mode</button>
-    </nav>
+    <div id="tableWrapper">
+        <table id="dataTable" border="1">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
     <div id="dropZone">Drop CSV here or choose a file</div>
     <div id="controls">
         <input type="file" id="csvFileInput" accept=".csv,.xlsx" />

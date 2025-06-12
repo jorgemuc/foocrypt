@@ -93,7 +93,7 @@
 ## Metrics
 Estimated total effort: 8 person-days
 Completion: 100%
-Last update: 2025-06-12 (session 20)
+Last update: 2025-06-12 (session 21)
 
 ## Scope / Level of Done
 - Portable Windows application with no installation
@@ -112,3 +112,8 @@ Last update: 2025-06-12 (session 20)
 - Parsed example CSV to confirm import works
 - Table headers remain visible; dropdown populates
 - Updated completion metrics
+
+### Session 21 (2025-06-12)
+- Added table wrapper for better header visibility
+- Added partner column check and clearer error messages on import
+- Tests pass after installing dependencies
