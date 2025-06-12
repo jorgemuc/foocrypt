@@ -277,6 +277,7 @@ function parseFile(file) {
       skipEmptyLines: true,
       dynamicTyping: false,
       delimitersToGuess: [",", ";", "\t", "|"] ,
+
       complete: (results) => {
         if (results.errors && results.errors.length) {
           console.error('Parse errors:', results.errors);
@@ -595,4 +596,3 @@ updateImportDisplay();
 ensureDocsDir();
 loadDocuments();
 loadTickets();
-
