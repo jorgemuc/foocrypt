@@ -3,3 +3,8 @@ node_modules/
 dist/
 data.json
 changelog.json
+
+uploads/
+tickets.json
+import-info.json
+

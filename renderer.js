@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 const { Chart } = require('chart.js');
+const XLSX = require('xlsx');
+const { shell } = require('electron');
+
 const os = require('os');
 
 let currentRows = [];
@@ -13,7 +16,81 @@ let changeLog = [];
 
 const dataPath = path.join(__dirname, 'data.json');
 const importInfoPath = path.join(__dirname, 'import-info.json');
+const docsDir = path.join(__dirname, 'uploads');
+const ticketsPath = path.join(__dirname, 'tickets.json');
 let lastImport = '';
+let documents = [];
+let tickets = [];
+
+function ensureDocsDir() {
+  try {
+    if (!fs.existsSync(docsDir)) {
+      fs.mkdirSync(docsDir);
+    }
+  } catch (err) {
+    console.error('Failed to create uploads directory:', err);
+  }
+}
+
+function loadDocuments() {
+  try {
+    documents = fs.readdirSync(docsDir);
+  } catch {
+    documents = [];
+  }
+  updateDocList();
+}
+
+function updateDocList() {
+  const ul = document.getElementById('docList');
+  if (!ul) return;
+  ul.innerHTML = '';
+  documents.forEach(name => {
+    const li = document.createElement('li');
+    li.textContent = name;
+    ul.appendChild(li);
+  });
+}
+
+function loadTickets() {
+  try {
+    if (fs.existsSync(ticketsPath)) {
+      tickets = JSON.parse(fs.readFileSync(ticketsPath, 'utf8'));
+    }
+  } catch {
+    tickets = [];
+  }
+  renderTickets();
+}
+
+function saveTickets() {
+  try {
+    fs.writeFileSync(ticketsPath, JSON.stringify(tickets, null, 2));
+  } catch {}
+}
+
+function renderTickets() {
+  const ul = document.getElementById('ticketList');
+  if (!ul) return;
+  ul.innerHTML = '';
+  tickets.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = `${t.time.split('T')[0]}: ${t.subject} (${t.status})`;
+    ul.appendChild(li);
+  });
+}
+
+function addTicket() {
+  const subject = prompt('Subject');
+  if (!subject) return;
+  const note = prompt('Note') || '';
+  const ticket = { time: new Date().toISOString(), subject, note, status: 'open' };
+  tickets.push(ticket);
+  renderTickets();
+  saveTickets();
+  logChange(-1, 'ticket', '', JSON.stringify(ticket));
+}
+
 
 function updateFilterOptions(rows) {
   const select = document.getElementById('filter');
@@ -45,8 +122,11 @@ function applyFilters() {
   }
   updateChart(rows);
   updateStatusChart(rows);
+  renderCards(rows);
   renderTable(rows);
   updateSummary(rows);
+  updateKPIs(rows);
+
 }
 
 function updateSummary(rows) {
@@ -55,6 +135,27 @@ function updateSummary(rows) {
     el.textContent = rows.length ? `${rows.length} records` : 'No data loaded';
   }
 }
+
+function updateKPIs(rows) {
+  const totalEl = document.getElementById('recordCountKpi');
+  if (totalEl) totalEl.textContent = `Records: ${rows.length}`;
+
+  const deadlineEl = document.getElementById('deadlineKpi');
+  if (!deadlineEl) return;
+  const key = Object.keys(rows[0] || {}).find(k => k.toLowerCase().includes('deadline'));
+  if (!key) {
+    deadlineEl.textContent = '';
+    return;
+  }
+  const now = new Date();
+  const soon = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const count = rows.filter(r => {
+    const d = new Date(r[key]);
+    return !isNaN(d) && d >= now && d <= soon;
+  }).length;
+  deadlineEl.textContent = `Deadlines ≤7d: ${count}`;
+}
+
 
 function updateImportDisplay() {
   const el = document.getElementById('lastImport');
@@ -148,19 +249,57 @@ function loadData() {
 
 function parseFile(file) {
   if (!file) return;
-  Papa.parse(file, {
-    header: true,
-    complete: (results) => {
-      currentRows = results.data.filter(r => Object.keys(r).length);
-      if (currentRows.length === 0) return;
+  const ext = path.extname(file.name).toLowerCase();
+  if (ext === '.xlsx' || ext === '.xls') {
+    try {
+      const wb = XLSX.readFile(file.path);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      currentRows = XLSX.utils.sheet_to_json(ws);
+      if (currentRows.length === 0) {
+        showToast('No valid rows found');
+        return;
+      }
       renderTableHeader(currentRows[0]);
       updateFilterOptions(currentRows);
       applyFilters();
+      updateKPIs(currentRows);
       saveData(currentRows);
       saveImportTime(new Date().toISOString());
       showToast('Import completed');
+    } catch (err) {
+      console.error('XLSX parse error:', err);
+      showToast('Failed to parse file');
     }
-  });
+  } else {
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (results.errors && results.errors.length) {
+          console.error('Parse errors:', results.errors);
+          showToast('Error parsing CSV');
+          return;
+        }
+        currentRows = results.data.filter(r => Object.keys(r).length);
+        if (currentRows.length === 0) {
+          showToast('No valid rows found');
+          return;
+        }
+        renderTableHeader(currentRows[0]);
+        updateFilterOptions(currentRows);
+        applyFilters();
+        updateKPIs(currentRows);
+        saveData(currentRows);
+        saveImportTime(new Date().toISOString());
+        showToast('Import completed');
+      },
+      error: (err) => {
+        console.error('Parse error:', err);
+        showToast('Failed to parse file');
+      }
+    });
+  }
+
 }
 
 function handleFileSelect(event) {
@@ -244,6 +383,21 @@ function renderTable(rows) {
   });
 }
 
+function renderCards(rows) {
+  const container = document.getElementById('cardContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  rows.forEach(row => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = Object.entries(row)
+      .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
+      .join('<br>');
+    container.appendChild(div);
+  });
+}
+
+
 function renderChangeLog() {
   const table = document.getElementById('changelogTable');
   const thead = table.querySelector('thead');
@@ -284,6 +438,11 @@ function editRow(index) {
   for (const key of Object.keys(row)) {
     const val = prompt(`Edit ${key}`, row[key]);
     if (val === null) continue;
+    if (val.trim() === '') {
+      showToast('Value cannot be empty');
+      continue;
+    }
+
     if (val !== row[key]) {
       logChange(index, key, row[key], val);
       row[key] = val;
@@ -322,28 +481,92 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
+function exportXLSX() {
+  if (currentRows.length === 0) return;
+  const ws = XLSX.utils.json_to_sheet(currentRows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  const filePath = path.join(__dirname, 'export.xlsx');
+  XLSX.writeFile(wb, filePath);
+  showToast('Exported to export.xlsx');
+}
+
+function exportChangeLog() {
+  if (changeLog.length === 0) return;
+  const csv = Papa.unparse(changeLog);
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'changelog.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+}
+
+
 document.getElementById('csvFileInput').addEventListener('change', handleFileSelect);
 document.getElementById('search').addEventListener('input', applyFilters);
 document.getElementById('filter').addEventListener('change', applyFilters);
 document.getElementById('exportBtn').addEventListener('click', exportCSV);
+document.getElementById('exportXlsxBtn').addEventListener('click', exportXLSX);
+document.getElementById('exportLogBtn').addEventListener('click', exportChangeLog);
+document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
 document.getElementById('navDashboard').addEventListener('click', () => {
   document.getElementById('changelogContainer').style.display = 'none';
+  document.getElementById('cardContainer').style.display = 'none';
+  document.getElementById('ticketSection').style.display = 'none';
+});
+document.getElementById('navCards').addEventListener('click', () => {
+  document.getElementById('changelogContainer').style.display = 'none';
+  document.getElementById('ticketSection').style.display = 'none';
+  document.getElementById('cardContainer').style.display = 'block';
+});
+document.getElementById('navTickets').addEventListener('click', () => {
+  document.getElementById('cardContainer').style.display = 'none';
+  document.getElementById('changelogContainer').style.display = 'none';
+  document.getElementById('ticketSection').style.display = 'block';
+  renderTickets();
+
 });
 document.getElementById('navLog').addEventListener('click', () => {
   renderChangeLog();
   document.getElementById('changelogContainer').style.display = 'block';
+  document.getElementById('cardContainer').style.display = 'none';
+  document.getElementById('ticketSection').style.display = 'none';
 });
-document.getElementById('newTicketBtn').addEventListener('click', () => {
-  alert('New ticket action triggered');
-});
+document.getElementById('newTicketBtn').addEventListener('click', addTicket);
+
 
 document.getElementById('uploadDocBtn').addEventListener('click', () => {
   document.getElementById('docInput').click();
 });
+document.getElementById('calendarBtn').addEventListener('click', () => {
+  shell.openExternal('https://calendar.google.com');
+});
+document.getElementById('contactBtn').addEventListener('click', () => {
+  shell.openExternal('mailto:contact@example.com');
+});
+document.getElementById('addTicketBtn').addEventListener('click', addTicket);
 
 document.getElementById('docInput').addEventListener('change', (e) => {
   if (e.target.files.length) {
-    showToast('Document selected: ' + e.target.files[0].name);
+    ensureDocsDir();
+    const file = e.target.files[0];
+    const dest = path.join(docsDir, file.name);
+    try {
+      fs.copyFileSync(file.path, dest);
+      showToast('Document uploaded: ' + file.name);
+      documents.push(file.name);
+      updateDocList();
+    } catch (err) {
+      console.error('Upload failed:', err);
+      showToast('Upload failed');
+    }
+
     e.target.value = '';
   }
 });
@@ -365,4 +588,10 @@ document.getElementById('userDisplay').textContent = `User: ${os.userInfo().user
 loadData();
 loadLog();
 updateSummary(currentRows);
+updateKPIs(currentRows);
 updateImportDisplay();
+ensureDocsDir();
+loadDocuments();
+loadTickets();
+
+
