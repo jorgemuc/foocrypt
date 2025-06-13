@@ -1,3 +1,4 @@
+
 let currentRows = [];
 let headerKeys = [];
 let chart;
@@ -153,7 +154,6 @@ function applyFilters() {
   updateKPIs(rows);
   updateDeadlineList(rows);
 }
-
 function updateSummary(rows) {
   const el = document.getElementById('summary');
   if (el) {
