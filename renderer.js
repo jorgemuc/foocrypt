@@ -1,4 +1,3 @@
-
 let currentRows = [];
 let headerKeys = [];
 let chart;
@@ -154,6 +153,7 @@ function applyFilters() {
   updateKPIs(rows);
   updateDeadlineList(rows);
 }
+
 function updateSummary(rows) {
   const el = document.getElementById('summary');
   if (el) {
@@ -599,84 +599,86 @@ function toggleDarkMode() {
   document.body.classList.toggle('dark');
 }
 
-document.getElementById('csvFileInput').addEventListener('change', handleFileSelect);
-document.getElementById('search').addEventListener('input', applyFilters);
-document.getElementById('filter').addEventListener('change', applyFilters);
-document.getElementById('exportBtn').addEventListener('click', exportCSV);
-document.getElementById('exportXlsxBtn').addEventListener('click', exportXLSX);
-document.getElementById('exportLogBtn').addEventListener('click', exportChangeLog);
-document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
-document.getElementById('navDashboard').addEventListener('click', () => {
-  document.getElementById('changelogContainer').style.display = 'none';
-  document.getElementById('cardContainer').style.display = 'none';
-  document.getElementById('ticketSection').style.display = 'none';
-});
-document.getElementById('navCards').addEventListener('click', () => {
-  document.getElementById('changelogContainer').style.display = 'none';
-  document.getElementById('ticketSection').style.display = 'none';
-  document.getElementById('cardContainer').style.display = 'block';
-});
-document.getElementById('navTickets').addEventListener('click', () => {
-  document.getElementById('cardContainer').style.display = 'none';
-  document.getElementById('changelogContainer').style.display = 'none';
-  document.getElementById('ticketSection').style.display = 'block';
-  renderTickets();
-});
-document.getElementById('navLog').addEventListener('click', () => {
-  renderChangeLog();
-  document.getElementById('changelogContainer').style.display = 'block';
-  document.getElementById('cardContainer').style.display = 'none';
-  document.getElementById('ticketSection').style.display = 'none';
-});
-document.getElementById('newTicketBtn').addEventListener('click', addTicket);
-document.getElementById('uploadDocBtn').addEventListener('click', () => {
-  document.getElementById('docInput').click();
-});
-document.getElementById('calendarBtn').addEventListener('click', () => {
-  window.api.openExternal('https://calendar.google.com');
-});
-document.getElementById('contactBtn').addEventListener('click', () => {
-  const subject = encodeURIComponent('Anfrage zum Partner Cockpit Dashboard');
-  const body = encodeURIComponent('Hallo Team, ich habe eine Frage zum Partner Cockpit Dashboard: [hier Anliegen eintragen]\n\nViele Grüße,');
-  window.api.openExternal(`mailto:support@partnerdashboard.com?subject=${subject}&body=${body}`);
-});
-document.getElementById('addTicketBtn').addEventListener('click', addTicket);
-document.getElementById('docInput').addEventListener('change', (e) => {
-  if (e.target.files.length) {
-    ensureDocsDir();
-    const file = e.target.files[0];
-    const dest = `${docsDir}/${file.name}`;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        window.api.writeFileBuffer(dest, new Uint8Array(ev.target.result));
-        showToast('Document uploaded: ' + file.name);
-        documents.push(file.name);
-        updateDocList();
-      } catch (err) {
-        console.error('Upload failed:', err);
-        showToast('Upload failed');
-      }
-    };
-    reader.onerror = () => {
-      showToast('Failed to read file');
-    };
-    reader.readAsArrayBuffer(file);
-    e.target.value = '';
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('csvFileInput').addEventListener('change', handleFileSelect);
+  document.getElementById('search').addEventListener('input', applyFilters);
+  document.getElementById('filter').addEventListener('change', applyFilters);
+  document.getElementById('exportBtn').addEventListener('click', exportCSV);
+  document.getElementById('exportXlsxBtn').addEventListener('click', exportXLSX);
+  document.getElementById('exportLogBtn').addEventListener('click', exportChangeLog);
+  document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
+  document.getElementById('navDashboard').addEventListener('click', () => {
+    document.getElementById('changelogContainer').style.display = 'none';
+    document.getElementById('cardContainer').style.display = 'none';
+    document.getElementById('ticketSection').style.display = 'none';
+  });
+  document.getElementById('navCards').addEventListener('click', () => {
+    document.getElementById('changelogContainer').style.display = 'none';
+    document.getElementById('ticketSection').style.display = 'none';
+    document.getElementById('cardContainer').style.display = 'block';
+  });
+  document.getElementById('navTickets').addEventListener('click', () => {
+    document.getElementById('cardContainer').style.display = 'none';
+    document.getElementById('changelogContainer').style.display = 'none';
+    document.getElementById('ticketSection').style.display = 'block';
+    renderTickets();
+  });
+  document.getElementById('navLog').addEventListener('click', () => {
+    renderChangeLog();
+    document.getElementById('changelogContainer').style.display = 'block';
+    document.getElementById('cardContainer').style.display = 'none';
+    document.getElementById('ticketSection').style.display = 'none';
+  });
+  document.getElementById('newTicketBtn').addEventListener('click', addTicket);
+  document.getElementById('uploadDocBtn').addEventListener('click', () => {
+    document.getElementById('docInput').click();
+  });
+  document.getElementById('calendarBtn').addEventListener('click', () => {
+    window.api.openExternal('https://calendar.google.com');
+  });
+  document.getElementById('contactBtn').addEventListener('click', () => {
+    const subject = encodeURIComponent('Anfrage zum Partner Cockpit Dashboard');
+    const body = encodeURIComponent('Hallo Team, ich habe eine Frage zum Partner Cockpit Dashboard: [hier Anliegen eintragen]\n\nViele Grüße,');
+    window.api.openExternal(`mailto:support@partnerdashboard.com?subject=${subject}&body=${body}`);
+  });
+  document.getElementById('addTicketBtn').addEventListener('click', addTicket);
+  document.getElementById('docInput').addEventListener('change', (e) => {
+    if (e.target.files.length) {
+      ensureDocsDir();
+      const file = e.target.files[0];
+      const dest = `${docsDir}/${file.name}`;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          window.api.writeFileBuffer(dest, new Uint8Array(ev.target.result));
+          showToast('Document uploaded: ' + file.name);
+          documents.push(file.name);
+          updateDocList();
+        } catch (err) {
+  console.error('Upload failed:', err);
+  showToast('Upload failed');
   }
+  };
+  reader.onerror = () => {
+  showToast('Failed to read file');
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value = '';
+  }
+  });
+  
+  document.addEventListener('dragover', (e) => { e.preventDefault(); });
+  document.addEventListener('drop', (e) => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file) parseUploadedFile(file); });
+  
+  document.getElementById('userDisplay').textContent = `User: ${window.api.userName()}`;
+  
+  loadData();
+  loadLog();
+  updateSummary(currentRows);
+  updateKPIs(currentRows);
+  updateDeadlineList(currentRows);
+  updateImportDisplay();
+  ensureDocsDir();
+  loadDocuments();
+  loadTickets();
 });
-
-document.addEventListener('dragover', (e) => { e.preventDefault(); });
-document.addEventListener('drop', (e) => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file) parseUploadedFile(file); });
-
-document.getElementById('userDisplay').textContent = `User: ${window.api.userName()}`;
-
-loadData();
-loadLog();
-updateSummary(currentRows);
-updateKPIs(currentRows);
-updateDeadlineList(currentRows);
-updateImportDisplay();
-ensureDocsDir();
-loadDocuments();
-loadTickets();

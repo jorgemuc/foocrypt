@@ -12,3 +12,4 @@
 - **Default security settings.** `nodeIntegration` should remain `false` and `contextIsolation` should be `true` unless explicitly required.
 - **IPC for system tasks.** Provide whitelisted IPC functions if the renderer needs to trigger file saves or exports.
 - **Keep the renderer code free of `require` for `fs`, `path`, or other Node modules.**
+

@@ -98,8 +98,8 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-Completion: 87%
-Last update: 2025-06-14
+Completion: 88%
+Last update: 2025-06-15
 ### Session 43 (2025-06-13)
 - Added binary file upload via FileReader and new IPC `writeFileBuffer`
 - Updated renderer to avoid relying on `file.path` when uploading documents
@@ -123,3 +123,7 @@ Last update: 2025-06-14
 - All tests pass
 - `npm start` fails: missing X server
 - `npm run dist` skipped (GitHub Actions only)
+### Session 45 (2025-06-15)
+- Wrapped all renderer initialization code in DOMContentLoaded to fix inactive UI elements
+- All tests pass
+
