@@ -111,11 +111,15 @@ function validateColumns(row) {
 }
 
 
-function updateFilterOptions(rows) {
-  const select = document.getElementById('filter');
-  if (!select) return;
-  const key = rows.length
-    ? Object.keys(rows[0]).find(k => k.toLowerCase().includes('partner')) ||
+  const select = document.getElementById("filter");
+  const searchEl = document.getElementById("search");
+  const filterVal = select ? select.value : "";
+  const term = searchEl ? searchEl.value.toLowerCase() : "";
+  if (rows.length) {
+    renderTableHeader(rows[0]);
+  } else {
+    document.querySelector("#dataTable thead").innerHTML = "";
+  }
       Object.keys(rows[0])[0]
     : null;
   select.dataset.key = key || '';

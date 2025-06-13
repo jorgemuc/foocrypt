@@ -92,10 +92,17 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-Completion: 95%
-Last update: 2025-06-12 (session 22)
+Completion: 96%
+Last update: 2025-06-13 (session 23)
 
 
+
+### Session 23 (2025-06-13)
+- Added example `PARTNER.csv` with extended columns for testing
+- Installed dependencies with `npm install`
+- Moved the data table above charts so headers appear immediately
+- Updated `applyFilters` to render table headers after filtering
+- Tests pass
 ## Scope / Level of Done
 - Portable Windows application with no installation
 - CSV import and export
