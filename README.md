@@ -20,11 +20,14 @@ This project is a minimal Electron prototype for a portable Windows dashboard ap
 - Manage tickets in a dedicated view
 - Switch to a card view of all partners
 - Open a calendar or contact link via quick action buttons
+  - The contact button opens an email to `support@partnerdashboard.com` with a
+    preset subject and body
 - Upload a document via the **Upload Document** button
 - Uploaded files are saved to the `uploads` folder in the app directory
 - View uploaded documents in a list below the table
   - Table headers are sticky so column titles stay visible
   - CSV columns are validated case-insensitively; missing required columns trigger a toast error
+  - Validation accepts custom required column names for reuse in tests
   - The console logs the number of parsed rows and the first row after each import for easier debugging
   - When no data is available, the table shows a "No data loaded" placeholder row
 - Visualize status counts in a pie chart if the CSV contains a `Status` column
@@ -53,6 +56,7 @@ Install dependencies once and then run tests and the app:
 ```bash
 npm install
 npm test
+# tests cover CSV parsing and core utilities
 npm start
 ```
   

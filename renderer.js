@@ -5,6 +5,7 @@ const { Chart } = require('chart.js');
 const XLSX = require('xlsx');
 const { shell } = require('electron');
 const os = require('os');
+const csvUtils = require("./csv-utils");
 
 let currentRows = [];
 let headerKeys = [];
@@ -318,83 +319,27 @@ function loadData() {
 
 function parseFile(file) {
   if (!file) return;
-  const ext = path.extname(file.name).toLowerCase();
-  if (ext === '.xlsx' || ext === '.xls') {
-    try {
-      const wb = XLSX.readFile(file.path);
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      currentRows = XLSX.utils.sheet_to_json(ws);
-      if (currentRows.length === 0) {
-        showToast('No valid rows found');
-        return;
-      }
-      if (!validateColumns(currentRows[0])) {
-        currentRows = [];
-        headerKeys = [];
-        return;
-      }
-      console.log(`Parsed ${currentRows.length} rows`);
-      console.log('First row:', JSON.stringify(currentRows[0]));
-      renderTableHeader(currentRows[0]);
-      updateFilterOptions(currentRows);
-      document.getElementById('filter').value = '';
-      document.getElementById('search').value = '';
-      applyFilters();
-      updateKPIs(currentRows);
-      saveData(currentRows);
-      saveImportTime(new Date().toISOString());
-      showToast('Import completed');
-      document.getElementById('dataTable').scrollIntoView();
-    } catch (err) {
-      console.error('XLSX parse error:', err);
-      showToast('Failed to parse file');
-    }
-  } else {
-    let content;
-    try {
-      content = fs.readFileSync(file.path, 'utf8');
-    } catch (err) {
-      console.error('Read error:', err);
-      showToast('Failed to read file');
+  try {
+    currentRows = csvUtils.parseFileSync(file.path);
+    if (!currentRows.length) {
+      showToast('No valid rows found');
       return;
     }
-    Papa.parse(content, {
-      header: true,
-      skipEmptyLines: true,
-      dynamicTyping: false,
-      delimitersToGuess: [",", ";", "\t", "|"],
-      complete: (results) => {
-        if (results.errors && results.errors.length) {
-          console.error('Parse errors:', results.errors);
-          showToast('Error parsing CSV');
-          return;
-        }
-        currentRows = results.data.filter(r => Object.keys(r).length);
-        console.log(`Parsed ${currentRows.length} rows`);
-        if (currentRows.length === 0) {
-          showToast('No valid rows found');
-          return;
-        }
-        console.log('First row:', JSON.stringify(currentRows[0]));
-        if (!validateColumns(currentRows[0])) {
-          currentRows = [];
-          headerKeys = [];
-          return;
-        }
-        renderTableHeader(currentRows[0]);
-        updateFilterOptions(currentRows);
-        applyFilters();
-        updateKPIs(currentRows);
-        saveData(currentRows);
-        saveImportTime(new Date().toISOString());
-        showToast('Import completed');
-        document.getElementById('dataTable').scrollIntoView();
-      },
-      error: (err) => {
-        console.error('Parse error:', err);
-        showToast('Failed to parse file');
-      }
-    });
+    console.log(`Parsed ${currentRows.length} rows`);
+    console.log('First row:', JSON.stringify(currentRows[0]));
+    renderTableHeader(currentRows[0]);
+    updateFilterOptions(currentRows);
+    document.getElementById('filter').value = '';
+    document.getElementById('search').value = '';
+    applyFilters();
+    updateKPIs(currentRows);
+    saveData(currentRows);
+    saveImportTime(new Date().toISOString());
+    showToast('Import completed');
+    document.getElementById('dataTable').scrollIntoView();
+  } catch (err) {
+    console.error('Parse error:', err);
+    showToast('Failed to parse file');
   }
 }
 
@@ -592,11 +537,17 @@ function exportCSV() {
 
 function exportXLSX() {
   if (currentRows.length === 0) return;
-  const ws = XLSX.utils.json_to_sheet(currentRows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  const filePath = path.join(__dirname, 'export.xlsx');
-  XLSX.writeFile(wb, filePath);
+  const buf = csvUtils.createXLSXBuffer(currentRows);
+  const blob = new Blob([buf], {
+    type:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'export.xlsx';
+  link.click();
+  URL.revokeObjectURL(url);
   showToast('Exported to export.xlsx');
 }
 
@@ -703,3 +654,5 @@ updateImportDisplay();
 ensureDocsDir();
 loadDocuments();
 loadTickets();
+
+if (typeof module !== "undefined" && module.exports) { module.exports.parseFile = parseFile; }

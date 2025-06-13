@@ -1,24 +1,20 @@
 # Project Progress
 
 ## Task Checklist
-- [x] Setup project with Electron
-- [x] Add basic UI files
-- [x] Configure electron-builder and npm scripts
-- [x] Persist imported data locally
-- [x] Implement edit dialogs and change log
-- [x] Add change log viewer and import timestamp widget
-- [x] CSV drag & drop and dropdown filters
-- [x] Row deletion with logging
-- [x] Status pie chart and document uploads
-- [x] Record count summary and KPI widgets
-- [x] Responsive styling and navigation
-- [x] Error handling and validations
-- [x] Windows build workflow on GitHub Actions
-- [x] Change log export and dark mode toggle
-- [x] Card view for partners
-- [x] Ticket list and add form
-- [x] XLSX import and export
-- [ ] Resolve DBus/X server issues (out of scope for now)
+- [x] Setup Electron project and basic UI
+- [x] CSV/XLSX import with drag & drop
+- [x] Table editing with change log persistence
+- [x] Filtering, search and card view
+- [x] KPI widgets and charts
+- [x] Ticket management and document uploads
+- [x] CSV/XLSX export and change log export
+- [x] Windows build workflow
+- [ ] Responsive layout polish (Epic 6.1)
+- [ ] Improved error feedback and localization (Epics 6.2, 6.3)
+- [ ] Ensure app exits without background processes (Epic 7.2)
+- [ ] Confirm portable packaging (Epic 7.1)
+- [ ] Resolve CSV import edge cases (bug)
+- [ ] Automated tests for navigation and export actions
 
 ## File Summary
 - `index.html` – dashboard UI with charts, tables, and controls
@@ -86,83 +82,41 @@
 ## Latest Test Results (session 20)
 - `npm test` – passed
 - `npm start` – fails: missing X server
-
 - `npm run dist` – skipped (runs in GitHub Actions)
-
-
-## Metrics
-Estimated total effort: 8 person-days
-Completion: 99%
-Last update: 2025-06-13 (session 29)
-=======
 
 ## Scope / Level of Done
 - Portable Windows application with no installation
 - CSV import and export
 - Editable table with filtering and search
-- Change log with persistence
+- Change log with persistence and export
 - KPI widgets and charts update dynamically
 - Quick actions for tickets and uploads
 - Local data stored only in the app directory
-- Documentation and workflow for building on GitHub Actions
-- Change log can be exported as CSV
 - Dark mode toggle available
+- Documentation and GitHub Actions build workflow
 
-### Session 20 (2025-06-12)
-- Verified backlog against feature set and bug report
-- Parsed example CSV to confirm import works
-- Table headers remain visible; dropdown populates
-- Updated completion metrics
+## File Summary
+- `index.html` – dashboard UI and controls
+- `renderer.js` – front-end logic (import, edit, charts, exports)
+- `csv-utils.js` – CSV/XLSX helpers
+- `main.js` – Electron entry
+- `build.js` – wrapper for electron-builder
+- `.github/workflows/windows-build.yml` – Windows build pipeline
+- `PARTNER.csv` – sample data
+- `test/` – unit tests
 
-### Session 21 (2025-06-12)
-- Added table wrapper for better header visibility
-- Added partner column check and clearer error messages on import
-- Tests pass after installing dependencies
+## Session Log
+### Session 34 (2025-06-13)
+- Added helper to create XLSX buffers and updated export to trigger download
+- Added test for XLSX buffer creation and updated test script
+- Installed dependencies before running tests
 
-### Session 22 (2025-06-12)
-- Validated required columns on import and improved error messages
-- Adjusted table styles so headers remain visible
-- Updated README with sticky header note and install instructions
-- Tests pass after installing dependencies
+## Latest Test Results
+- `npm test` – passed
+- `npm start` – fails: missing X server
+- `npm run dist` – skipped (runs in GitHub Actions)
 
-### Session 23 (2025-06-13)
-- Added example `PARTNER.csv` with extended columns for testing
-- Installed dependencies with `npm install`
-- Moved the data table above charts so headers appear immediately
-- Updated `applyFilters` to render table headers after filtering
-- Tests pass
-
-### Session 24 (2025-06-13)
-- Verified repository state and cleaned up files
-- Updated progress metrics and documentation
-- Tests pass; build and start remain blocked by missing X server and wine
-
-### Session 25 (2025-06-13)
-- Added upcoming deadlines list with `updateDeadlineList` function
-- Updated README and dashboard HTML
-- Tests pass; build/start remain blocked due to X server and wine
-
-### Session 26 (2025-06-13)
-- Hid deadline section when column missing and show message when none upcoming
-- Updated README and progress log
-- Tests pass
-
-### Session 27 (2025-06-13)
-- Improved CSV column validation (case-insensitive) and added placeholder row when no data
-- Table header now remains visible even if no rows are loaded
-- Updated README and tests remain passing
-
-### Session 28 (2025-06-13)
-- Normalized column names in validation
-- Added console debug logs for row count and first row
-- Tests pass
-
-### Session 29 (2025-06-13)
-- Verified CSV parsing with PARTNER.csv; partner and system columns detected
-- npm install to fetch dependencies
-- npm test passed
-- Start and build remain blocked due to missing X server and wine
-\n### Session 30 (2025-06-13)
-- Fixed CSV import not displaying data by reading files via fs and resetting filters
-- Updated contact button to use project email with subject and body
-- Documented session and tests
+## Metrics
+Estimated total effort: 8 person-days
+Completion: 95%
+Last update: 2025-06-13
