@@ -95,6 +95,7 @@ Estimated total effort: 8 person-days
 Completion: 97%
 Last update: 2025-06-13 (session 24)
 
+
 ## Scope / Level of Done
 - Portable Windows application with no installation
 - CSV import and export
