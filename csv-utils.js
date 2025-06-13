@@ -15,38 +15,48 @@ function hasSystemColumn(row) {
   return row && Object.keys(row).some(k => normalizeKey(k).includes('system'));
 }
 
-function validateColumns(row, required = ['partner', 'system']) {
-  if (!row) return false;
+function getMissingColumns(row, required = ['partner', 'system']) {
+  if (!row) return required.slice();
   const keys = Object.keys(row).map(normalizeKey);
-  return required.every(req => {
+  return required.filter(req => {
     const norm = normalizeKey(req);
-    return keys.some(k => k.includes(norm));
+    return !keys.some(k => k.includes(norm));
   });
+}
+
+function validateColumns(row, required = ['partner', 'system']) {
+  return getMissingColumns(row, required).length === 0;
+}
+
+function parseCsvString(content, required = ['partner', 'system']) {
+  const result = Papa.parse(content, {
+    header: true,
+    skipEmptyLines: true,
+    delimitersToGuess: [',', ';', '\t', '|']
+  });
+  if (result.errors && result.errors.length) {
+    throw new Error('Parse error');
+  }
+  const rows = result.data.filter(r => Object.keys(r).length);
+  if (rows.length && !validateColumns(rows[0], required)) {
+    throw new Error('Missing required column');
+  }
+  return rows;
 }
 
 function parseFileSync(filePath) {
   const ext = path.extname(filePath).toLowerCase();
-  let rows = [];
   if (ext === '.xlsx' || ext === '.xls') {
     const wb = XLSX.readFile(filePath);
     const ws = wb.Sheets[wb.SheetNames[0]];
-    rows = XLSX.utils.sheet_to_json(ws);
-  } else {
-    const content = fs.readFileSync(filePath, 'utf8');
-    const result = Papa.parse(content, {
-      header: true,
-      skipEmptyLines: true,
-      delimitersToGuess: [',', ';', '\t', '|']
-    });
-    if (result.errors && result.errors.length) {
-      throw new Error('Parse error');
+    const rows = XLSX.utils.sheet_to_json(ws);
+    if (rows.length && !validateColumns(rows[0])) {
+      throw new Error('Missing required column');
     }
-    rows = result.data.filter(r => Object.keys(r).length);
+    return rows;
   }
-  if (rows.length && !validateColumns(rows[0])) {
-    throw new Error('Missing required column');
-  }
-  return rows;
+  const content = fs.readFileSync(filePath, 'utf8');
+  return parseCsvString(content);
 }
 
 function createXLSXBuffer(rows) {
@@ -58,7 +68,9 @@ function createXLSXBuffer(rows) {
 
 module.exports = {
   normalizeKey,
+  getMissingColumns,
   validateColumns,
+  parseCsvString,
   parseFileSync,
   createXLSXBuffer,
 };

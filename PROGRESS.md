@@ -54,10 +54,23 @@
 - Documented bug fix for import error
 
 ### Session 37 (2025-06-16)
-- Installed project dependencies to run tests
-- Added column validation in `afterParse` so missing headers show errors
-- All unit tests pass
-- `npm start` still fails due to missing X server
+ - Installed project dependencies to run tests
+ - Added column validation in `afterParse` so missing headers show errors
+ - All unit tests pass
+ - `npm start` still fails due to missing X server
+
+### Session 38 (2025-06-17)
+ - Added helper to detect missing CSV columns and show toast with names
+ - Updated renderer to use the helper and tests to cover this case
+ - All tests pass
+ - `npm start` still fails: missing X server
+
+### Session 39 (2025-06-13)
+ - Added `parseCsvString` helper for easier string parsing
+ - Updated renderer to parse uploaded files directly and handle errors
+ - Added test for `parseCsvString`
+ - All tests pass
+ - `npm start` still fails: missing X server
 
 ## Latest Test Results
 - `npm test` – passed
@@ -66,7 +79,5 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-Completion: 98%
-Last update: 2025-06-16
-
-
+Completion: 99%
+Last update: 2025-06-13

@@ -322,13 +322,15 @@ function afterParse() {
     showToast('No valid rows found');
     return;
   }
-  if (!validateColumns(currentRows[0])) {
+  const missing = csvUtils.getMissingColumns(currentRows[0]);
+  if (missing.length) {
     currentRows = [];
     updateSummary(currentRows);
     updateKPIs(currentRows);
     renderTable([]);
     renderCards([]);
     updateFilterOptions([]);
+    showToast('Missing required columns: ' + missing.join(', '));
     return;
   }
   console.log(`Parsed ${currentRows.length} rows`);
@@ -345,8 +347,7 @@ function afterParse() {
   document.getElementById('dataTable').scrollIntoView();
 }
 
-function parseFile(file) {
-  if (!file) return;
+function parseUploadedFile(file) {
   const ext = path.extname(file.name || '').toLowerCase();
   if (ext === '.xlsx' || ext === '.xls') {
     const reader = new FileReader();
@@ -359,7 +360,7 @@ function parseFile(file) {
         afterParse();
       } catch (err) {
         console.error('Parse error:', err);
-        showToast('Failed to parse file');
+        showToast('Failed to parse file: ' + err.message);
       }
     };
     reader.onerror = (err) => {
@@ -378,14 +379,16 @@ function parseFile(file) {
       },
       error: (err) => {
         console.error('Parse error:', err);
-        showToast('Failed to parse file');
+        showToast('Failed to parse file: ' + err.message);
       }
     });
   }
 }
 
 function handleFileSelect(event) {
-  parseFile(event.target.files[0]);
+  const file = event.target.files[0];
+  if (!file) return;
+  parseUploadedFile(file);
 }
 
 function updateChart(rows) {
@@ -679,7 +682,7 @@ document.addEventListener('dragover', (e) => {
 document.addEventListener('drop', (e) => {
   e.preventDefault();
   const file = e.dataTransfer.files[0];
-  parseFile(file);
+  if (file) parseUploadedFile(file);
 });
 
 // Show current username

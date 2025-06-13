@@ -26,7 +26,7 @@ This project is a minimal Electron prototype for a portable Windows dashboard ap
 - Uploaded files are saved to the `uploads` folder in the app directory
 - View uploaded documents in a list below the table
   - Table headers are sticky so column titles stay visible
-  - CSV columns are validated case-insensitively; missing required columns trigger a toast error
+  - CSV columns are validated case-insensitively; missing required columns trigger a toast error listing the names
   - Validation accepts custom required column names for reuse in tests
   - The console logs the number of parsed rows and the first row after each import for easier debugging
   - When no data is available, the table shows a "No data loaded" placeholder row
