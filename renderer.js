@@ -110,7 +110,6 @@ function validateColumns(row) {
   return true;
 }
 
-
 function updateFilterOptions(rows) {
   const select = document.getElementById('filter');
   if (!select) return;
@@ -132,16 +131,21 @@ function updateFilterOptions(rows) {
 
 function applyFilters() {
   let rows = currentRows.slice();
-  const select = document.getElementById('filter');
-  const searchEl = document.getElementById('search');
-  const filterVal = select ? select.value : '';
-  const term = searchEl ? searchEl.value.toLowerCase() : '';
+  const select = document.getElementById("filter");
+  const searchEl = document.getElementById("search");
+  const filterVal = select ? select.value : "";
+  const term = searchEl ? searchEl.value.toLowerCase() : "";
   if (filterVal) {
     const key = select ? select.dataset.key : null;
     if (key) rows = rows.filter(r => r[key] === filterVal);
   }
   if (term) {
     rows = rows.filter(r => JSON.stringify(r).toLowerCase().includes(term));
+  }
+  if (rows.length) {
+    renderTableHeader(rows[0]);
+  } else {
+    document.querySelector("#dataTable thead").innerHTML = "";
   }
   updateChart(rows);
   updateStatusChart(rows);
@@ -150,7 +154,6 @@ function applyFilters() {
   updateSummary(rows);
   updateKPIs(rows);
 }
-
 function updateSummary(rows) {
   const el = document.getElementById('summary');
   if (el) {

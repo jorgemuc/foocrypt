@@ -92,8 +92,8 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-Completion: 95%
-Last update: 2025-06-12 (session 22)
+Completion: 97%
+Last update: 2025-06-13 (session 24)
 
 
 ## Scope / Level of Done
@@ -124,4 +124,16 @@ Last update: 2025-06-12 (session 22)
 - Adjusted table styles so headers remain visible
 - Updated README with sticky header note and install instructions
 - Tests pass after installing dependencies
+
+### Session 23 (2025-06-13)
+- Added example `PARTNER.csv` with extended columns for testing
+- Installed dependencies with `npm install`
+- Moved the data table above charts so headers appear immediately
+- Updated `applyFilters` to render table headers after filtering
+- Tests pass
+
+### Session 24 (2025-06-13)
+- Verified repository state and cleaned up files
+- Updated progress metrics and documentation
+- Tests pass; build and start remain blocked by missing X server and wine
 
