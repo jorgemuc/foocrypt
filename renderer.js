@@ -655,6 +655,4 @@ ensureDocsDir();
 loadDocuments();
 loadTickets();
 
-
 if (typeof module !== "undefined" && module.exports) { module.exports.parseFile = parseFile; }
-
