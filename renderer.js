@@ -305,6 +305,8 @@ function loadData() {
         renderTable(currentRows);
         renderTableHeader(currentRows[0]);
         updateFilterOptions(currentRows);
+        document.getElementById('filter').value = '';
+        document.getElementById('search').value = '';
         applyFilters();
       }
     }
@@ -335,6 +337,8 @@ function parseFile(file) {
       console.log('First row:', JSON.stringify(currentRows[0]));
       renderTableHeader(currentRows[0]);
       updateFilterOptions(currentRows);
+      document.getElementById('filter').value = '';
+      document.getElementById('search').value = '';
       applyFilters();
       updateKPIs(currentRows);
       saveData(currentRows);
@@ -346,11 +350,19 @@ function parseFile(file) {
       showToast('Failed to parse file');
     }
   } else {
-    Papa.parse(file, {
+    let content;
+    try {
+      content = fs.readFileSync(file.path, 'utf8');
+    } catch (err) {
+      console.error('Read error:', err);
+      showToast('Failed to read file');
+      return;
+    }
+    Papa.parse(content, {
       header: true,
       skipEmptyLines: true,
       dynamicTyping: false,
-      delimitersToGuess: [",", ";", "\t", "|"] ,
+      delimitersToGuess: [",", ";", "\t", "|"],
       complete: (results) => {
         if (results.errors && results.errors.length) {
           console.error('Parse errors:', results.errors);
@@ -642,7 +654,11 @@ document.getElementById('calendarBtn').addEventListener('click', () => {
   shell.openExternal('https://calendar.google.com');
 });
 document.getElementById('contactBtn').addEventListener('click', () => {
-  shell.openExternal('mailto:contact@example.com');
+  const subject = encodeURIComponent('Anfrage zum Partner Cockpit Dashboard');
+  const body = encodeURIComponent(
+    'Hallo Team, ich habe eine Frage zum Partner Cockpit Dashboard: [hier Anliegen eintragen]\n\nViele Grüße,'
+  );
+  shell.openExternal(`mailto:support@partnerdashboard.com?subject=${subject}&body=${body}`);
 });
 document.getElementById('addTicketBtn').addEventListener('click', addTicket);
 

@@ -2,7 +2,6 @@
 
 This project is a minimal Electron prototype for a portable Windows dashboard application. It demonstrates CSV import, local persistence and basic chart rendering.
 -
-
 ## Features
 - Import partner data from CSV or XLSX files (file chooser or drag & drop)
 - Search within imported data and filter the bar chart

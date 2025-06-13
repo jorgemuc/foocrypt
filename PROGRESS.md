@@ -93,8 +93,8 @@
 ## Metrics
 Estimated total effort: 8 person-days
 Completion: 99%
-Last update: 2025-06-13 (session 28)
-
+Last update: 2025-06-13 (session 29)
+=======
 
 ## Scope / Level of Done
 - Portable Windows application with no installation
@@ -156,3 +156,13 @@ Last update: 2025-06-13 (session 28)
 - Normalized column names in validation
 - Added console debug logs for row count and first row
 - Tests pass
+
+### Session 29 (2025-06-13)
+- Verified CSV parsing with PARTNER.csv; partner and system columns detected
+- npm install to fetch dependencies
+- npm test passed
+- Start and build remain blocked due to missing X server and wine
+\n### Session 30 (2025-06-13)
+- Fixed CSV import not displaying data by reading files via fs and resetting filters
+- Updated contact button to use project email with subject and body
+- Documented session and tests
