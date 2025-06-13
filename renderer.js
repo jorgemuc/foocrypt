@@ -322,6 +322,15 @@ function afterParse() {
     showToast('No valid rows found');
     return;
   }
+  if (!validateColumns(currentRows[0])) {
+    currentRows = [];
+    updateSummary(currentRows);
+    updateKPIs(currentRows);
+    renderTable([]);
+    renderCards([]);
+    updateFilterOptions([]);
+    return;
+  }
   console.log(`Parsed ${currentRows.length} rows`);
   console.log('First row:', JSON.stringify(currentRows[0]));
   renderTableHeader(currentRows[0]);
@@ -686,6 +695,7 @@ updateImportDisplay();
 ensureDocsDir();
 loadDocuments();
 loadTickets();
+
 
 if (typeof module !== "undefined" && module.exports) { module.exports.parseFile = parseFile; }
 

@@ -48,14 +48,17 @@
 - Added new `afterParse` helper and FileReader logic
 - Installed project dependencies before running tests
 
-<<<<<<< 4vizo7-codex/implementiere-partner-cockpit-dashboard-als-windows-app
 ### Session 36 (2025-06-15)
 - Verified CSV import works using Papaparse directly on File objects
 - Installed dependencies and ran tests successfully
 - Documented bug fix for import error
 
-=======
->>>>>>> master
+### Session 37 (2025-06-16)
+- Installed project dependencies to run tests
+- Added column validation in `afterParse` so missing headers show errors
+- All unit tests pass
+- `npm start` still fails due to missing X server
+
 ## Latest Test Results
 - `npm test` – passed
 - `npm start` – fails: missing X server
@@ -63,10 +66,7 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-<<<<<<< 4vizo7-codex/implementiere-partner-cockpit-dashboard-als-windows-app
-Completion: 97%
-Last update: 2025-06-15
-=======
-Completion: 96%
-Last update: 2025-06-14
->>>>>>> master
+Completion: 98%
+Last update: 2025-06-16
+
+
