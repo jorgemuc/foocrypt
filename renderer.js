@@ -317,29 +317,61 @@ function loadData() {
   }
 }
 
+function afterParse() {
+  if (!currentRows.length) {
+    showToast('No valid rows found');
+    return;
+  }
+  console.log(`Parsed ${currentRows.length} rows`);
+  console.log('First row:', JSON.stringify(currentRows[0]));
+  renderTableHeader(currentRows[0]);
+  updateFilterOptions(currentRows);
+  document.getElementById('filter').value = '';
+  document.getElementById('search').value = '';
+  applyFilters();
+  updateKPIs(currentRows);
+  saveData(currentRows);
+  saveImportTime(new Date().toISOString());
+  showToast('Import completed');
+  document.getElementById('dataTable').scrollIntoView();
+}
+
 function parseFile(file) {
   if (!file) return;
-  try {
-    currentRows = csvUtils.parseFileSync(file.path);
-    if (!currentRows.length) {
-      showToast('No valid rows found');
-      return;
-    }
-    console.log(`Parsed ${currentRows.length} rows`);
-    console.log('First row:', JSON.stringify(currentRows[0]));
-    renderTableHeader(currentRows[0]);
-    updateFilterOptions(currentRows);
-    document.getElementById('filter').value = '';
-    document.getElementById('search').value = '';
-    applyFilters();
-    updateKPIs(currentRows);
-    saveData(currentRows);
-    saveImportTime(new Date().toISOString());
-    showToast('Import completed');
-    document.getElementById('dataTable').scrollIntoView();
-  } catch (err) {
-    console.error('Parse error:', err);
-    showToast('Failed to parse file');
+  const ext = path.extname(file.name || '').toLowerCase();
+  if (ext === '.xlsx' || ext === '.xls') {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        currentRows = XLSX.utils.sheet_to_json(ws);
+        afterParse();
+      } catch (err) {
+        console.error('Parse error:', err);
+        showToast('Failed to parse file');
+      }
+    };
+    reader.onerror = (err) => {
+      console.error('Read error:', err);
+      showToast('Failed to read file');
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      delimitersToGuess: [',', ';', '\t', '|'],
+      complete: (results) => {
+        currentRows = results.data.filter(r => Object.keys(r).length);
+        afterParse();
+      },
+      error: (err) => {
+        console.error('Parse error:', err);
+        showToast('Failed to parse file');
+      }
+    });
   }
 }
 
@@ -656,3 +688,4 @@ loadDocuments();
 loadTickets();
 
 if (typeof module !== "undefined" && module.exports) { module.exports.parseFile = parseFile; }
+
