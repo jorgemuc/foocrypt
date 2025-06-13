@@ -85,6 +85,12 @@
 - `npm start` fails: missing X server
 - `npm run dist` skipped (GitHub Actions only)
 
+### Session 44 (2025-06-13)
+- Installed project dependencies and ran all unit tests successfully
+- Verified no Node.js modules are loaded in the renderer
+- Added policy note to README and updated completion metrics
+
+
 ## Latest Test Results
 - `npm test` – passed
 - `npm start` – fails: missing X server
@@ -92,8 +98,8 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-Completion: 85%
-Last update: 2025-06-13
+Completion: 87%
+Last update: 2025-06-14
 ### Session 43 (2025-06-13)
 - Added binary file upload via FileReader and new IPC `writeFileBuffer`
 - Updated renderer to avoid relying on `file.path` when uploading documents
@@ -107,5 +113,13 @@ Last update: 2025-06-13
 - Converted `csv-utils.js` to a browser-friendly module
 - Updated HTML to load libraries via script tags
 - Tests pass after refactor
+- `npm start` fails: missing X server
+- `npm run dist` skipped (GitHub Actions only)
+
+### Session 43 (2025-06-14)
+- Reworked CSV import to read the file via `FileReader.readAsText`
+- Added new test `render-parser.test.js` verifying CSV string parsing
+- Updated documentation to mention FileReader usage and test coverage
+- All tests pass
 - `npm start` fails: missing X server
 - `npm run dist` skipped (GitHub Actions only)

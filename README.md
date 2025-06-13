@@ -26,8 +26,10 @@ This project is a minimal Electron prototype for a portable Windows dashboard ap
 - Uploaded files are saved to the `uploads` folder in the app directory
 - View uploaded documents in a list below the table
   - Table headers are sticky so column titles stay visible
+  - CSV files are read with **FileReader** and parsed from the resulting string
   - CSV columns are validated case-insensitively; missing required columns trigger a toast error listing the names
   - Validation accepts custom required column names for reuse in tests
+  - Automated tests verify CSV, XLSX and XLS parsing
   - The console logs the number of parsed rows and the first row after each import for easier debugging
   - When no data is available, the table shows a "No data loaded" placeholder row
 - Visualize status counts in a pie chart if the CSV contains a `Status` column
@@ -65,6 +67,10 @@ Each modification is logged to `changelog.json` in the app directory.
 Use **Export Log** to download the change log as CSV.
 
 ## Notes
- - Renderer uses browser APIs only; Node integration is disabled and file operations occur via IPC.
- - The start command runs Electron with `--no-sandbox`.
- - Windows builds are created by the GitHub Actions workflow.
+- Renderer uses browser APIs only; Node integration is disabled and file operations occur via IPC.
+- The start command runs Electron with `--no-sandbox`.
+- Windows builds are created by the GitHub Actions workflow.
+- Development follows the Electron policy in `AGENTS.md`: the renderer never
+  loads Node modules directly and all filesystem access goes through IPC
+  channels. The project avoids installing `xvfb` or `wine`; Windows builds are
+  produced in GitHub Actions.

@@ -356,19 +356,22 @@ function parseUploadedFile(file) {
     };
     reader.readAsArrayBuffer(file);
   } else {
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      delimitersToGuess: [',', ';', '\t', '|'],
-      complete: (results) => {
-        currentRows = results.data.filter(r => Object.keys(r).length);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const rows = csvUtils.parseCsvString(e.target.result);
+        currentRows = rows;
         afterParse();
-      },
-      error: (err) => {
+      } catch (err) {
         console.error('Parse error:', err);
         showToast('Failed to parse file: ' + err.message);
       }
-    });
+    };
+    reader.onerror = (err) => {
+      console.error('Read error:', err);
+      showToast('Failed to read file');
+    };
+    reader.readAsText(file);
   }
 }
 

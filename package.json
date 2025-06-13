@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "./node_modules/.bin/electron --no-sandbox .",
-    "test": "node test/test.js && node test/csv.test.js && node test/validate.test.js && node test/xlsx.test.js",
+    "test": "node test/test.js && node test/csv.test.js && node test/validate.test.js && node test/xlsx.test.js && node test/render-parser.test.js",
     "dist": "node build.js"
   },
   "keywords": [],
