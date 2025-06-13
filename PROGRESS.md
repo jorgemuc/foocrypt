@@ -92,8 +92,8 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-Completion: 97%
-Last update: 2025-06-13 (session 24)
+Completion: 99%
+Last update: 2025-06-13 (session 28)
 
 
 ## Scope / Level of Done
@@ -137,3 +137,22 @@ Last update: 2025-06-13 (session 24)
 - Updated progress metrics and documentation
 - Tests pass; build and start remain blocked by missing X server and wine
 
+### Session 25 (2025-06-13)
+- Added upcoming deadlines list with `updateDeadlineList` function
+- Updated README and dashboard HTML
+- Tests pass; build/start remain blocked due to X server and wine
+
+### Session 26 (2025-06-13)
+- Hid deadline section when column missing and show message when none upcoming
+- Updated README and progress log
+- Tests pass
+
+### Session 27 (2025-06-13)
+- Improved CSV column validation (case-insensitive) and added placeholder row when no data
+- Table header now remains visible even if no rows are loaded
+- Updated README and tests remain passing
+
+### Session 28 (2025-06-13)
+- Normalized column names in validation
+- Added console debug logs for row count and first row
+- Tests pass

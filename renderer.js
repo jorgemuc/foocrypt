@@ -7,6 +7,7 @@ const { shell } = require('electron');
 const os = require('os');
 
 let currentRows = [];
+let headerKeys = [];
 let chart;
 let statusChart;
 
@@ -90,21 +91,29 @@ function addTicket() {
   logChange(-1, 'ticket', '', JSON.stringify(ticket));
 }
 
+function normalizeKey(k) {
+  return k ? k.toString().trim().toLowerCase().replace(/\s+/g, '') : '';
+}
+
 function hasPartnerColumn(row) {
   if (!row) return false;
-  return Object.keys(row).some(k => k.toLowerCase().includes('partner'));
+  return Object.keys(row).some(k => normalizeKey(k).includes('partner'));
+}
+
+function hasSystemColumn(row) {
+  if (!row) return false;
+  return Object.keys(row).some(k => normalizeKey(k).includes('system'));
 }
 
 function validateColumns(row) {
-  const required = ['Partnername', 'Systemname'];
-  for (const col of required) {
-    if (!Object.keys(row).includes(col)) {
-      showToast(`CSV not compatible: column ${col} missing`);
-      return false;
-    }
-  }
   if (!hasPartnerColumn(row)) {
+    console.error('Missing Partner column', Object.keys(row));
     showToast('CSV not compatible: Partner column missing');
+    return false;
+  }
+  if (!hasSystemColumn(row)) {
+    console.error('Missing System column', Object.keys(row));
+    showToast('CSV not compatible: System column missing');
     return false;
   }
   return true;
@@ -144,8 +153,10 @@ function applyFilters() {
   }
   if (rows.length) {
     renderTableHeader(rows[0]);
-  } else {
-    document.querySelector("#dataTable thead").innerHTML = "";
+  } else if (headerKeys.length) {
+    const dummy = {};
+    headerKeys.forEach(k => (dummy[k] = ''));
+    renderTableHeader(dummy);
   }
   updateChart(rows);
   updateStatusChart(rows);
@@ -153,6 +164,7 @@ function applyFilters() {
   renderTable(rows);
   updateSummary(rows);
   updateKPIs(rows);
+  updateDeadlineList(rows);
 }
 function updateSummary(rows) {
   const el = document.getElementById('summary');
@@ -179,6 +191,37 @@ function updateKPIs(rows) {
     return !isNaN(d) && d >= now && d <= soon;
   }).length;
   deadlineEl.textContent = `Deadlines ≤7d: ${count}`;
+}
+
+function updateDeadlineList(rows) {
+  const list = document.getElementById('deadlineList');
+  const section = document.getElementById('deadlineSection');
+  if (!list || !section) return;
+  list.innerHTML = '';
+  const key = Object.keys(rows[0] || {}).find(k => k.toLowerCase().includes('deadline'));
+  const nameKey = Object.keys(rows[0] || {}).find(k => k.toLowerCase().includes('partner'));
+  if (!key || !nameKey) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  const now = new Date();
+  const upcoming = rows
+    .map(r => ({ name: r[nameKey], date: new Date(r[key]) }))
+    .filter(r => !isNaN(r.date) && r.date >= now)
+    .sort((a, b) => a.date - b.date)
+    .slice(0, 5);
+  if (upcoming.length === 0) {
+    const li = document.createElement('li');
+    li.textContent = 'No upcoming deadlines';
+    list.appendChild(li);
+  } else {
+    upcoming.forEach(u => {
+      const li = document.createElement('li');
+      li.textContent = `${u.name}: ${u.date.toISOString().split('T')[0]}`;
+      list.appendChild(li);
+    });
+  }
 }
 
 function updateImportDisplay() {
@@ -285,8 +328,11 @@ function parseFile(file) {
       }
       if (!validateColumns(currentRows[0])) {
         currentRows = [];
+        headerKeys = [];
         return;
       }
+      console.log(`Parsed ${currentRows.length} rows`);
+      console.log('First row:', JSON.stringify(currentRows[0]));
       renderTableHeader(currentRows[0]);
       updateFilterOptions(currentRows);
       applyFilters();
@@ -312,12 +358,15 @@ function parseFile(file) {
           return;
         }
         currentRows = results.data.filter(r => Object.keys(r).length);
+        console.log(`Parsed ${currentRows.length} rows`);
         if (currentRows.length === 0) {
           showToast('No valid rows found');
           return;
         }
+        console.log('First row:', JSON.stringify(currentRows[0]));
         if (!validateColumns(currentRows[0])) {
           currentRows = [];
+          headerKeys = [];
           return;
         }
         renderTableHeader(currentRows[0]);
@@ -386,6 +435,7 @@ function updateStatusChart(rows) {
 function renderTableHeader(row) {
   const thead = document.querySelector('#dataTable thead');
   thead.innerHTML = '';
+  headerKeys = Object.keys(row);
   const tr = document.createElement('tr');
   Object.keys(row).forEach(k => {
     const th = document.createElement('th');
@@ -401,6 +451,15 @@ function renderTableHeader(row) {
 function renderTable(rows) {
   const tbody = document.querySelector('#dataTable tbody');
   tbody.innerHTML = '';
+  if (rows.length === 0) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.textContent = 'No data loaded';
+    td.colSpan = headerKeys.length + 1;
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
   rows.forEach((row, index) => {
     const tr = document.createElement('tr');
     Object.values(row).forEach(val => {
@@ -623,6 +682,7 @@ loadData();
 loadLog();
 updateSummary(currentRows);
 updateKPIs(currentRows);
+updateDeadlineList(currentRows);
 updateImportDisplay();
 ensureDocsDir();
 loadDocuments();

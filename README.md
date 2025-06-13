@@ -24,10 +24,14 @@ This project is a minimal Electron prototype for a portable Windows dashboard ap
 - Upload a document via the **Upload Document** button
 - Uploaded files are saved to the `uploads` folder in the app directory
 - View uploaded documents in a list below the table
-- Table headers are sticky so column titles stay visible
-- CSV columns are validated; missing required columns trigger an error
+  - Table headers are sticky so column titles stay visible
+  - CSV columns are validated case-insensitively; missing required columns trigger a toast error
+  - The console logs the number of parsed rows and the first row after each import for easier debugging
+  - When no data is available, the table shows a "No data loaded" placeholder row
 - Visualize status counts in a pie chart if the CSV contains a `Status` column
 - Toggle dark mode via the **Toggle Dark Mode** button
+- Display the next five deadlines in a list if a `Deadline` column exists;
+  the section stays hidden when none is found
 
 ## Usage
 1. Install dependencies:
