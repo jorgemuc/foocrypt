@@ -1,0 +1,34 @@
+{
+  "name": "foocrypt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "./node_modules/.bin/electron --no-sandbox .",
+    "test": "node test/test.js && node test/csv.test.js && node test/validate.test.js && node test/xlsx.test.js && node test/render-parser.test.js",
+    "dist": "node build.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^36.4.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.example.partnerdashboard",
+    "productName": "Partner Cockpit Dashboard",
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "portable"
+    }
+  },
+  "dependencies": {
+    "chart.js": "^4.4.9",
+    "papaparse": "^5.5.3",
+    "xlsx": "^0.18.5"
+  }
+}
