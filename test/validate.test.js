@@ -1,7 +1,6 @@
 const assert = require('assert');
 const { validateColumns, getMissingColumns } = require('../csv-utils');
 
-
 const row = { 'PartnerName': 'A', 'SystemName': 'S', 'Other': 'x' };
 // Should succeed when both required columns are present
 assert.strictEqual(validateColumns(row, ['partnername','systemname']), true);

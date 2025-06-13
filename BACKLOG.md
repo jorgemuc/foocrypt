@@ -158,4 +158,4 @@ US 7.2: Keine Hintergrundprozesse
 ENDE DES BACKLOGS
 
 ## Backlog Completion
-Alle Aufgaben umgesetzt. Completion: 100%.
+Noch offene Aufgaben in Epics 6 und 7. Completion: 85%.

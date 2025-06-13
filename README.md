@@ -65,5 +65,6 @@ Each modification is logged to `changelog.json` in the app directory.
 Use **Export Log** to download the change log as CSV.
 
 ## Notes
+ - Renderer uses browser APIs only; Node integration is disabled and file operations occur via IPC.
  - The start command runs Electron with `--no-sandbox`.
  - Windows builds are created by the GitHub Actions workflow.

@@ -1,32 +1,19 @@
-const fs = require('fs');
-const path = require('path');
-const Papa = require('papaparse');
-const { Chart } = require('chart.js');
-const XLSX = require('xlsx');
-const { shell } = require('electron');
-const os = require('os');
-const csvUtils = require("./csv-utils");
 
 let currentRows = [];
 let headerKeys = [];
 let chart;
 let statusChart;
-
-const logPath = path.join(__dirname, 'changelog.json');
+const { logPath, dataPath, importInfoPath, docsDir, ticketsPath } = window.paths;
 let changeLog = [];
-
-const dataPath = path.join(__dirname, 'data.json');
-const importInfoPath = path.join(__dirname, 'import-info.json');
-const docsDir = path.join(__dirname, 'uploads');
-const ticketsPath = path.join(__dirname, 'tickets.json');
 let lastImport = '';
 let documents = [];
 let tickets = [];
+const csvUtils = window.csvUtils;
 
 function ensureDocsDir() {
   try {
-    if (!fs.existsSync(docsDir)) {
-      fs.mkdirSync(docsDir);
+    if (!window.api.exists(docsDir)) {
+      window.api.mkdir(docsDir);
     }
   } catch (err) {
     console.error('Failed to create uploads directory:', err);
@@ -35,7 +22,7 @@ function ensureDocsDir() {
 
 function loadDocuments() {
   try {
-    documents = fs.readdirSync(docsDir);
+    documents = window.api.readdir(docsDir);
   } catch {
     documents = [];
   }
@@ -55,8 +42,8 @@ function updateDocList() {
 
 function loadTickets() {
   try {
-    if (fs.existsSync(ticketsPath)) {
-      tickets = JSON.parse(fs.readFileSync(ticketsPath, 'utf8'));
+    if (window.api.exists(ticketsPath)) {
+      tickets = JSON.parse(window.api.readFile(ticketsPath));
     }
   } catch {
     tickets = [];
@@ -66,7 +53,7 @@ function loadTickets() {
 
 function saveTickets() {
   try {
-    fs.writeFileSync(ticketsPath, JSON.stringify(tickets, null, 2));
+    window.api.writeFile(ticketsPath, JSON.stringify(tickets, null, 2));
   } catch {}
 }
 
@@ -236,7 +223,7 @@ function saveImportTime(time) {
   lastImport = time;
   updateImportDisplay();
   try {
-    fs.writeFileSync(importInfoPath, JSON.stringify({ lastImport: time }, null, 2));
+    window.api.writeFile(importInfoPath, JSON.stringify({ lastImport: time }, null, 2));
   } catch (err) {
     console.error('Failed to save import info:', err);
   }
@@ -244,8 +231,8 @@ function saveImportTime(time) {
 
 function loadImportTime() {
   try {
-    if (fs.existsSync(importInfoPath)) {
-      const raw = fs.readFileSync(importInfoPath, 'utf8');
+    if (window.api.exists(importInfoPath)) {
+      const raw = window.api.readFile(importInfoPath);
       const info = JSON.parse(raw);
       if (info.lastImport) {
         lastImport = info.lastImport;
@@ -269,7 +256,7 @@ function showToast(msg) {
 
 function saveData(rows) {
   try {
-    fs.writeFileSync(dataPath, JSON.stringify(rows, null, 2));
+    window.api.writeFile(dataPath, JSON.stringify(rows, null, 2));
   } catch (err) {
     console.error('Failed to save data:', err);
   }
@@ -277,7 +264,7 @@ function saveData(rows) {
 
 function saveLog() {
   try {
-    fs.writeFileSync(logPath, JSON.stringify(changeLog, null, 2));
+    window.api.writeFile(logPath, JSON.stringify(changeLog, null, 2));
   } catch (err) {
     console.error('Failed to save change log:', err);
   }
@@ -285,8 +272,8 @@ function saveLog() {
 
 function loadLog() {
   try {
-    if (fs.existsSync(logPath)) {
-      const raw = fs.readFileSync(logPath, 'utf8');
+    if (window.api.exists(logPath)) {
+      const raw = window.api.readFile(logPath);
       const logs = JSON.parse(raw);
       if (Array.isArray(logs)) changeLog = logs;
     }
@@ -297,8 +284,8 @@ function loadLog() {
 
 function loadData() {
   try {
-    if (fs.existsSync(dataPath)) {
-      const raw = fs.readFileSync(dataPath, 'utf8');
+    if (window.api.exists(dataPath)) {
+      const raw = window.api.readFile(dataPath);
       const rows = JSON.parse(raw);
       if (Array.isArray(rows) && rows.length) {
         currentRows = rows;
@@ -348,8 +335,8 @@ function afterParse() {
 }
 
 function parseUploadedFile(file) {
-  const ext = path.extname(file.name || '').toLowerCase();
-  if (ext === '.xlsx' || ext === '.xls') {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'xlsx' || ext === 'xls') {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -562,7 +549,6 @@ function deleteRow(index) {
   applyFilters();
 }
 
-
 function handleSearch() {
   applyFilters();
 }
@@ -583,8 +569,7 @@ function exportXLSX() {
   if (currentRows.length === 0) return;
   const buf = csvUtils.createXLSXBuffer(currentRows);
   const blob = new Blob([buf], {
-    type:
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -641,54 +626,48 @@ document.getElementById('navLog').addEventListener('click', () => {
   document.getElementById('ticketSection').style.display = 'none';
 });
 document.getElementById('newTicketBtn').addEventListener('click', addTicket);
-
 document.getElementById('uploadDocBtn').addEventListener('click', () => {
   document.getElementById('docInput').click();
 });
 document.getElementById('calendarBtn').addEventListener('click', () => {
-  shell.openExternal('https://calendar.google.com');
+  window.api.openExternal('https://calendar.google.com');
 });
 document.getElementById('contactBtn').addEventListener('click', () => {
   const subject = encodeURIComponent('Anfrage zum Partner Cockpit Dashboard');
-  const body = encodeURIComponent(
-    'Hallo Team, ich habe eine Frage zum Partner Cockpit Dashboard: [hier Anliegen eintragen]\n\nViele Grüße,'
-  );
-  shell.openExternal(`mailto:support@partnerdashboard.com?subject=${subject}&body=${body}`);
+  const body = encodeURIComponent('Hallo Team, ich habe eine Frage zum Partner Cockpit Dashboard: [hier Anliegen eintragen]\n\nViele Grüße,');
+  window.api.openExternal(`mailto:support@partnerdashboard.com?subject=${subject}&body=${body}`);
 });
 document.getElementById('addTicketBtn').addEventListener('click', addTicket);
-
 document.getElementById('docInput').addEventListener('change', (e) => {
   if (e.target.files.length) {
     ensureDocsDir();
     const file = e.target.files[0];
-    const dest = path.join(docsDir, file.name);
-    try {
-      fs.copyFileSync(file.path, dest);
-      showToast('Document uploaded: ' + file.name);
-      documents.push(file.name);
-      updateDocList();
-    } catch (err) {
-      console.error('Upload failed:', err);
-      showToast('Upload failed');
-    }
+    const dest = `${docsDir}/${file.name}`;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        window.api.writeFileBuffer(dest, new Uint8Array(ev.target.result));
+        showToast('Document uploaded: ' + file.name);
+        documents.push(file.name);
+        updateDocList();
+      } catch (err) {
+        console.error('Upload failed:', err);
+        showToast('Upload failed');
+      }
+    };
+    reader.onerror = () => {
+      showToast('Failed to read file');
+    };
+    reader.readAsArrayBuffer(file);
     e.target.value = '';
   }
 });
 
-document.addEventListener('dragover', (e) => {
-  e.preventDefault();
-});
+document.addEventListener('dragover', (e) => { e.preventDefault(); });
+document.addEventListener('drop', (e) => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file) parseUploadedFile(file); });
 
-document.addEventListener('drop', (e) => {
-  e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if (file) parseUploadedFile(file);
-});
+document.getElementById('userDisplay').textContent = `User: ${window.api.userName()}`;
 
-// Show current username
-document.getElementById('userDisplay').textContent = `User: ${os.userInfo().username}`;
-
-// Load persisted data on startup
 loadData();
 loadLog();
 updateSummary(currentRows);
@@ -698,7 +677,3 @@ updateImportDisplay();
 ensureDocsDir();
 loadDocuments();
 loadTickets();
-
-
-if (typeof module !== "undefined" && module.exports) { module.exports.parseFile = parseFile; }
-

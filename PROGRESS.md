@@ -72,6 +72,19 @@
  - All tests pass
  - `npm start` still fails: missing X server
 
+### Session 40 (2025-06-13)
+- Reviewed backlog and progress files, adjusted completion metrics
+- Confirmed remaining open tasks: responsive layout, improved error feedback, localization, portable packaging and exit handling
+- All tests pass
+
+
+### Session 41 (2025-06-13)
+- Documented Electron development policy in AGENTS.md disallowing Node modules in the renderer and specifying IPC usage
+- No code changes yet; renderer still uses Node APIs
+- All unit tests pass
+- `npm start` fails: missing X server
+- `npm run dist` skipped (GitHub Actions only)
+
 ## Latest Test Results
 - `npm test` – passed
 - `npm start` – fails: missing X server
@@ -79,5 +92,20 @@
 
 ## Metrics
 Estimated total effort: 8 person-days
-Completion: 99%
+Completion: 85%
 Last update: 2025-06-13
+### Session 43 (2025-06-13)
+- Added binary file upload via FileReader and new IPC `writeFileBuffer`
+- Updated renderer to avoid relying on `file.path` when uploading documents
+- Tests pass after refactor
+- `npm start` still fails (no X server)
+- `npm run dist` skipped (GitHub Actions only)
+### Session 42 (2025-06-13)
+- Refactored renderer to remove all Node module usage and rely on IPC
+- Added `preload.js` exposing filesystem and OS helpers via `contextBridge`
+- Updated `main.js` with `nodeIntegration:false` and IPC handlers
+- Converted `csv-utils.js` to a browser-friendly module
+- Updated HTML to load libraries via script tags
+- Tests pass after refactor
+- `npm start` fails: missing X server
+- `npm run dist` skipped (GitHub Actions only)
